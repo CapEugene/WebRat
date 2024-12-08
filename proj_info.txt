@@ -1,0 +1,146 @@
+CREATE DATABASE appRating;
+CREATE USER defuser WITH ENCRYPTED PASSWORD 'defuser';
+GRANT ALL PRIVILEGES ON DATABASE appRating TO defuser;
+
+CREATE TABLE Users (
+    UserID SERIAL PRIMARY KEY,
+    Username VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL,
+    JoinDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Avatar TEXT
+);
+
+CREATE TABLE Games (
+    GameID SERIAL PRIMARY KEY,
+    Title VARCHAR(100) NOT NULL,
+    Genre VARCHAR(50),
+    ReleaseDate DATE,
+    Developer VARCHAR(100),
+    Publisher VARCHAR(100),
+    Platform VARCHAR(50),
+    Description TEXT,
+    CoverImage TEXT
+);
+
+CREATE TABLE Reviews (
+    ReviewID SERIAL PRIMARY KEY,
+    GameID INT REFERENCES Games(GameID) ON DELETE CASCADE,
+    UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
+    Rating INT CHECK (Rating BETWEEN 1 AND 10),
+    ReviewText TEXT,
+    ReviewDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    Likes INT DEFAULT 0
+);
+
+CREATE TABLE Comments (
+    CommentID SERIAL PRIMARY KEY,
+    ReviewID INT REFERENCES Reviews(ReviewID) ON DELETE CASCADE,
+    UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
+    CommentText TEXT NOT NULL,
+    CommentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Favorites (
+    FavoriteID SERIAL PRIMARY KEY,
+    UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
+    GameID INT REFERENCES Games(GameID) ON DELETE CASCADE
+);
+
+CREATE TABLE Companies (
+    CompanyID SERIAL PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    FoundedYear INT CHECK (FoundedYear > 1800),
+    Country VARCHAR(50),
+    Website TEXT
+);
+
+CREATE TABLE GameStatistics (
+    GameStatID SERIAL PRIMARY KEY,
+    GameID INT REFERENCES Games(GameID) ON DELETE CASCADE,
+    AverageRating NUMERIC(3, 2) DEFAULT 0,
+    ReviewCount INT DEFAULT 0,
+);
+
+CREATE TABLE Genres (
+    GenreID SERIAL PRIMARY KEY,
+    GenreName VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE GameGenres (
+    GameGenreID SERIAL PRIMARY KEY,
+    GameID INT REFERENCES Games(GameID) ON DELETE CASCADE,
+    GenreID INT REFERENCES Genres(GenreID) ON DELETE CASCADE
+);
+
+INSERT INTO Users (Username, Email, PasswordHash, Avatar) VALUES
+('gamer123', 'gamer123@example.com', 'hashed_password1', 'avatar1.png'),
+('player_one', 'playerone@example.com', 'hashed_password2', 'avatar2.png'),
+('pro_gamer', 'progamer@example.com', 'hashed_password3', 'avatar3.png'),
+('noob_master', 'noobmaster@example.com', 'hashed_password4', 'avatar4.png'),
+('chess_wizard', 'chesswizard@example.com', 'hashed_password5', 'avatar5.png');
+
+INSERT INTO Games (Title, Genre, ReleaseDate, Developer, Publisher, Platform, Description, CoverImage) VALUES
+('The Great Adventure', 'Action', '2023-06-15', 'Adventure Inc', 'GameWorld', 'PC', 'An epic adventure game.', 'cover1.jpg'),
+('Mystery Island', 'Puzzle', '2022-11-20', 'PuzzlePro', 'Mystery Co', 'Mobile', 'Solve puzzles on a mysterious island.', 'cover2.jpg'),
+('Space Conqueror', 'Strategy', '2021-05-10', 'Galactic Games', 'StarPublish', 'PC', 'Build your space empire.', 'cover3.jpg'),
+('Zombie Hunt', 'Shooter', '2023-01-25', 'Zombie Labs', 'Hunt Studios', 'Console', 'Survive the zombie apocalypse.', 'cover4.jpg'),
+('Fantasy Quest', 'RPG', '2020-08-30', 'QuestMakers', 'RPGWorld', 'PC', 'An immersive fantasy role-playing game.', 'cover5.jpg');
+
+INSERT INTO Reviews (GameID, UserID, Rating, ReviewText, Likes) VALUES
+(1, 1, 8, 'Great graphics and gameplay!', 10),
+(2, 2, 9, 'Loved the puzzles and story.', 15),
+(3, 3, 7, 'Decent strategy game, but lacks depth.', 8),
+(4, 4, 6, 'Fun for a while, but gets repetitive.', 5),
+(5, 5, 10, 'Best RPG I have ever played!', 25);
+
+INSERT INTO Comments (ReviewID, UserID, CommentText) VALUES
+(1, 2, 'Totally agree with this review!'),
+(1, 3, 'I had a similar experience.'),
+(2, 4, 'The puzzles were amazing!'),
+(3, 5, 'I found it more engaging than expected.'),
+(4, 1, 'Repetition is an issue for sure.');
+
+INSERT INTO Favorites (UserID, GameID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+INSERT INTO Companies (Name, FoundedYear, Country, Website) VALUES
+('Adventure Inc', 2005, 'USA', 'https://adventureinc.com'),
+('PuzzlePro', 2010, 'UK', 'https://puzzlepro.com'),
+('Galactic Games', 2012, 'Germany', 'https://galacticgames.de'),
+('Zombie Labs', 2015, 'Canada', 'https://zombielabs.ca'),
+('QuestMakers', 2008, 'Japan', 'https://questmakers.jp');
+
+INSERT INTO Messages (SenderID, ReceiverID, MessageText) VALUES
+(1, 2, 'Hey, have you played the new game?'),
+(2, 3, 'Check out Mystery Island!'),
+(3, 4, 'I love the strategy elements in Space Conqueror.'),
+(4, 5, 'What do you think about Zombie Hunt?'),
+(5, 1, 'Fantasy Quest is a masterpiece!');
+
+INSERT INTO GameStatistics (GameID, AverageRating, ReviewCount) VALUES
+(1, 8.5, 2),
+(2, 9.0, 1),
+(3, 7.0, 1),
+(4, 6.5, 1),
+(5, 9.3, 1);
+
+INSERT INTO Genres (GenreName) VALUES
+('Action'),
+('Puzzle'),
+('Strategy'),
+('Shooter'),
+('RPG');
+
+INSERT INTO GameGenres (GameID, GenreID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5);
+
+
