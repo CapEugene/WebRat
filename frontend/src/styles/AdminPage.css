@@ -17,19 +17,24 @@
 }
 
 .form-container {
-  background-color: #f9f9f9;
+  margin: 20px auto;
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  width: 90%; /* Ограничение ширины контейнера */
+  max-width: 600px; /* Максимальная ширина для крупных экранов */
+  box-sizing: border-box;
 }
 
 .input-field {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
+  width: 100%; /* Поля занимают всю ширину контейнера */
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 3px;
+  margin-bottom: 15px; /* Отступы между полями */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box; /* Учитываем внутренние отступы */
 }
 
 .add-button, .update-button, .delete-button {
@@ -131,10 +136,9 @@ textarea.input-field {
 }
 
 textarea.input-field {
-  resize: vertical;
+  resize: vertical; /* Ограничиваем изменение размера только по вертикали */
   min-height: 100px;
   max-height: 300px;
-  overflow-y: auto;
 }
 
 .save-button,
@@ -156,4 +160,18 @@ textarea.input-field {
   background: #dc3545;
   color: #fff;
   margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    width: 95%; /* Для маленьких экранов */
+  }
+
+  .input-field {
+    font-size: 12px; /* Уменьшаем шрифт для маленьких экранов */
+  }
+
+  .add-button {
+    font-size: 12px; /* Уменьшаем размер кнопки для маленьких экранов */
+  }
 }
