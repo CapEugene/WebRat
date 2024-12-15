@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { loginUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import '../styles/LoginPage.css';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -22,7 +23,7 @@ const LoginPage = () => {
         const { token } = response.data;
         localStorage.setItem('token', token);
         window.dispatchEvent(new Event('storage'));
-        alert('Login successful!');
+        //alert('Login successful!');
         navigate('/profile');
   })
   .catch((err) => alert(`Error: ${err.response?.data?.message || 'Login failed'}`));
@@ -30,25 +31,32 @@ const LoginPage = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        onChange={handleChange}
-        value={formData.email}
-        required
-      />
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        onChange={handleChange}
-        value={formData.password}
-        required
-      />
-      <button type="submit">Login</button>
-    </form>
+    <div className="login-page">
+      <h1 className="login-title">Login</h1>
+      <form onSubmit={handleSubmit} className="login-form">
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          value={formData.email}
+          required
+          className="input-field"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          value={formData.password}
+          required
+          className="input-field"
+        />
+        <button type="submit" className="submit-button">
+          Login
+        </button>
+      </form>
+    </div>
   );
 };
 

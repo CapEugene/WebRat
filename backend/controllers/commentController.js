@@ -1,5 +1,4 @@
 const CommentModel = require('../models/CommentModel');
-const UserModel = require('../models/UserModel');
 
 const getCommentsByReview = async (req, res) => {
     const { reviewId } = req.params;
@@ -18,7 +17,7 @@ const getCommentsByReview = async (req, res) => {
   
     try {
       const newComment = await CommentModel.addComment(reviewId, userId, commentText);
-      const user = await UserModel.getUserById(userId); // тут возникает ошибка
+      const user = await CommentModel.getUserById(userId); // тут возникает ошибка
   
       const commentWithUser = {
         ...newComment,
@@ -31,9 +30,5 @@ const getCommentsByReview = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-  
-  
-  
-  
 
   module.exports = { getCommentsByReview, addComment };

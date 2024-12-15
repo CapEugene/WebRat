@@ -41,4 +41,34 @@ export const getTokenInfo = () => apiClient.get(`/users/tokeninfo/`);
 export const likeReview = async (reviewId) => {
   const response = await apiClient.post(`/reviews/${reviewId}/like/`);
   return response.data;
+};
+
+export const fetchFavorites = async () => {
+  const response = await apiClient.get('/favorites/');
+  return response.data;
+};
+
+export const fetchGenres = async () => {
+  //console.log('Fetching genres...');
+  const response = await apiClient.get(`/games/genres/getgenres/`);
+  return response.data;
 }
+
+export const addFavorite = async (gameId) => {
+  const response = await apiClient.post('/favorites/add/', { gameId });
+  return response.data;
+};
+
+export const removeFavorite = async (gameId) => {
+  const response = await apiClient.delete(`/favorites/${gameId}/`);
+  return response.data;
+};
+
+export const addGame = async (data) => {
+  const response = await apiClient.post('/games/add/', data);
+  return response.data;
+};
+
+export const deleteGame = async (gameId) => apiClient.delete(`/games/${gameId}/remove`);
+
+export const updateGame = async (data) => apiClient.post(`/games/${data.gameid}/update`, data);

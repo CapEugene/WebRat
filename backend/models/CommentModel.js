@@ -17,4 +17,11 @@ const addComment = async (reviewId, userId, commentText) => {
   return result.rows[0];
 };
 
-module.exports = { getCommentsByReviewId, addComment };
+const getUserById = async (userId) => {
+  const query = 'SELECT * FROM Users WHERE UserID = $1';
+  const result = await db.query(query, [userId]);
+  // console.log(userId);
+  return result.rows[0];
+};
+
+module.exports = { getCommentsByReviewId, addComment, getUserById };

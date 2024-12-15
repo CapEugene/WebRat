@@ -53,7 +53,37 @@ const ReviewModel = {
       `;
       await pool.query(updateQuery, [review.reviewid, review.likes]);
     }
-  }
+  },
+
+  async updateGameStatistics(gameId, newRating) {
+    const checkQuery = `SELECT COUNT(*) FROM GameStatistics WHERE GameStatId = $1`;
+    const { rows } = await pool.query(checkQuery, [gameId]);
+  
+    if (rows[0].count === "0") {
+      // Если записи нет, создаем её
+      const insertQuery = `
+        INSERT INTO GameStatistics (GameId, AverageRating, ReviewCount)
+        VALUES ($1, $2, 1);
+      `;
+      await pool.query(insertQuery, [gameId, newRating]);
+    } else {
+      const updateQuery = `
+        UPDATE GameStatistics
+        SET 
+          AverageRating = ((GameStatistics.AverageRating * GameStatistics.ReviewCount) + $2) / (GameStatistics.ReviewCount + 1),
+          ReviewCount = GameStatistics.ReviewCount + 1
+        WHERE GameStatId = $1;
+      `;
+      await pool.query(updateQuery, [gameId, newRating]);
+    }
+  },
+
+  async getUserById(userId) {
+    const query = 'SELECT * FROM Users WHERE UserID = $1';
+    const result = await pool.query(query, [userId]);
+    // console.log(userId);
+    return result.rows[0];
+  },
   
 };
 

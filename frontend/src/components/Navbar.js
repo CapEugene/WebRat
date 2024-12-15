@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getTokenInfo } from '../services/api';
+import '../styles/Navbar.css';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -40,26 +41,49 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false); // Локально обновляем состояние
-    alert('You have been logged out!');
+    //alert('You have been logged out!');
     navigate('/');
   };
 
   return (
-    <nav style={styles.navbar}>
-      <Link to="/" style={styles.link}>Home</Link>
-      {isLoggedIn && <Link to="/profile" style={styles.link}>Profile</Link>}
-      {!isLoggedIn && <Link to="/register" style={styles.link}>Register</Link>}
-      {!isLoggedIn && <Link to="/login" style={styles.link}>Login</Link>}
-      {isLoggedIn && <span onClick={handleLogout} style={styles.link}>Logout</span>}
-      <h1>{isLoggedIn && tokenInfo ? `Welcome, ${tokenInfo.username}!` : 'Please, log in!'}</h1>
+    <nav className="navbar">
+      <div className="navbar-brand">
+        <Link to="/" className="navbar-logo">
+          🎮 RatSite
+        </Link>
+      </div>
+      <ul className="navbar-links">
+        <li>
+          <Link to="/" className="nav-link">Home</Link>
+        </li>
+        {isLoggedIn && (
+          <li>
+            <Link to="/profile" className="nav-link">Profile</Link>
+          </li>
+        )}
+        {!isLoggedIn && (
+          <>
+            <li>
+              <Link to="/register" className="nav-link">Register</Link>
+            </li>
+            <li>
+              <Link to="/login" className="nav-link">Login</Link>
+            </li>
+          </>
+        )}
+        {isLoggedIn && (
+          <li>
+            <span onClick={handleLogout} className="nav-link logout-link">Logout</span>
+          </li>
+        )}
+      </ul>
+      {isLoggedIn && tokenInfo && (
+        <div className="navbar-user">
+          <span>Welcome, <strong>{tokenInfo.username}</strong>!</span>
+        </div>
+      )}
     </nav>
   );
-};
-
-const styles = {
-  navbar: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: '15px', paddingLeft: '70px', paddingRight: '70px', background: '#333', color: '#fff', },
-  link: { color: '#fff', textDecoration: 'none' },
-  logoutButton: { background: 'none', border: 'none', color: '#fff', textDecoration: 'none', cursor: 'pointer' },
 };
 
 export default Navbar;

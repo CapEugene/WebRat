@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CommentSection from './CommentSection';
 import { likeReview } from '../services/api';
 import { format } from 'date-fns';
+import '../styles/ReviewCard.css';
 
 const ReviewCard = ({ review, onAddComment }) => {
   const [commentsVisible, setCommentsVisible] = useState(false);
@@ -38,31 +39,33 @@ const ReviewCard = ({ review, onAddComment }) => {
   }
 
   return (
-    <div style={styles.card}>
-      <h4>User: {review.username}</h4>
-      <p>Rating: {review.rating}</p>
-      <p>{review.reviewtext}</p>
-      <p>Review Date: {formatSafeDate(review.reviewdate)}</p>
-      {isLoggedIn && <button style={styles.button} onClick={handleLike}>Like ({likes})</button>}
-      <button style={styles.toggleButton} onClick={toggleComments}>
-        {commentsVisible ? 'Hide Comments' : 'Show Comments'}
-      </button>
-
+    <div className="review-card">
+      <div className="review-header">
+        <h4>{review.username}</h4>
+        <p className="review-date">{formatSafeDate(review.reviewdate)}</p>
+      </div>
+      <div className="review-body">
+        <p className="review-rating">Rating: {review.rating}/10</p>
+        <p className="review-text">{review.reviewtext}</p>
+      </div>
+      <div className="review-footer">
+        {isLoggedIn && (
+          <button className="like-button" onClick={handleLike}>
+            👍 Like ({likes})
+          </button>
+        )}
+        <button className="toggle-comments-button" onClick={toggleComments}>
+          {commentsVisible ? 'Hide Comments' : 'Show Comments'}
+        </button>
+      </div>
       {commentsVisible && (
         <CommentSection
-      comments={review.comments} // Передаем массив комментариев
-      onAddComment={(commentText) => onAddComment(review.reviewid, commentText)} // Передаем функцию добавления комментария
-/>
-
+          comments={review.comments}
+          onAddComment={(commentText) => onAddComment(review.reviewid, commentText)}
+        />
       )}
     </div>
   );
-};
-
-const styles = {
-  card: { border: '1px solid #ddd', padding: '10px', borderRadius: '8px', margin: '10px 0' },
-  button: { marginTop: '10px', padding: '5px 10px', border: 'none', backgroundColor: '#007BFF', color: '#fff' },
-  toggleButton: { marginLeft: '10px', padding: '5px 10px', border: 'none', backgroundColor: '#6c757d', color: '#fff' },
 };
 
 export default ReviewCard;

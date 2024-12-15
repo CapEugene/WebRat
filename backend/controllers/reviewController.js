@@ -1,6 +1,4 @@
 const ReviewModel = require('../models/ReviewModel');
-const UserModel = require('../models/UserModel');
-const GameModel = require('../models/GameModel')
 
 const getReviewsByGameId = async (req, res) => {
   const { gameId } = req.params;
@@ -24,10 +22,12 @@ const addReview = async (req, res) => {
   try {
     // Предполагаем, что есть функция для создания отзыва
     const review = await ReviewModel.createReview({ gameId, userId, rating, reviewText });
-    await GameModel.updateGameStatistics(gameId, rating);
+    console.log(review);
+    await ReviewModel.updateGameStatistics(gameId, rating);
 
     // Получаем имя пользователя из базы
-    const user = await UserModel.getUserById(userId);
+    const user = await ReviewModel.getUserById(userId);
+    // console.log(user.username);
 
     res.status(201).json({ ...review, username: user.username });
   } catch (error) {

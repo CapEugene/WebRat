@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/CommentSection.css';
 
 const CommentSection = ({ comments, onAddComment }) => {
   const [newComment, setNewComment] = useState('');
@@ -22,40 +23,34 @@ const CommentSection = ({ comments, onAddComment }) => {
   };
 
   return (
-    <div>
-      <h4>Comments</h4>
-      <ul>
+    <div className="comment-section">
+      <h4 className="comment-section-title">Comments</h4>
+      <ul className="comment-list">
         {comments.map((comment) => (
-          <li key={comment.commentid}>
-            <strong>{comment.username}:</strong> {comment.commenttext}
+          <li key={comment.commentid} className="comment-item">
+            <strong className="comment-author">{comment.username}:</strong>
+            <p className="comment-text">{comment.commenttext}</p>
           </li>
         ))}
       </ul>
 
       {isLoggedIn ? (
-        <form onSubmit={handleSubmit}>
+        <form className="comment-form" onSubmit={handleSubmit}>
           <textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Write a comment..."
-            style={styles.textarea}
+            className="comment-textarea"
           />
-          <button type="submit" style={styles.button}>
+          <button type="submit" className="comment-submit-button">
             Post
           </button>
         </form>
       ) : (
-        <p style={styles.notice}>Please log in to add a comment.</p>
+        <p className="comment-login-notice">Please log in to add a comment.</p>
       )}
     </div>
   );
-};
-
-
-const styles = {
-  textarea: { width: '100%', height: '50px', marginBottom: '10px', resize: 'none' },
-  button: { padding: '5px 10px', border: 'none', backgroundColor: '#007BFF', color: '#fff' },
-  notice: { color: '#FF0000', fontStyle: 'italic' },
 };
 
 export default CommentSection;

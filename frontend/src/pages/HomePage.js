@@ -1,35 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import GameCard from '../components/GameCard';
 import { fetchGames } from '../services/api';
+import '../styles/HomePage.css';
 
 const HomePage = () => {
   const [games, setGames] = useState([]);
+  const [sortedGames, setSortedGames] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState('');
 
   useEffect(() => {
-    fetchGames().then((response) => setGames(response.data));
+    fetchGames().then((response) => {
+      setGames(response.data);
+      setSortedGames(response.data);
+      console.log(response.data);
+    });
   }, []);
 
-  /*useEffect(() => {
-    fetchGames().then((response) => {
-      console.log('Fetched games:', response.data);
-      setGames(response.data);
-    });
-  }, []);*/
+  const handleSortChange = (criteria) => {
+    setSortCriteria(criteria);
+
+    const sorted = [...games];
+    if (criteria === 'reviews') {
+      sorted.sort((a, b) => (b.reviewcount || 0) - (a.reviewcount || 0));
+    } else if (criteria === 'rating') {
+      sorted.sort((a, b) => (b.averagerating || 0) - (a.averagerating || 0));
+    }
+
+    setSortedGames(sorted);
+  };
+
 
   return (
-    <div>
-      <h1 style={styles.title}>Games</h1>
-      <div style={styles.grid}>
-        {games.map((game) => (
+    <div className="home-page">
+      <h1 className="home-title">Games</h1>
+      <div className="sort-container">
+        <label htmlFor="sort" className="sort-label">Sort by: </label>
+        <select
+          id="sort"
+          value={sortCriteria}
+          onChange={(e) => handleSortChange(e.target.value)}
+          className="sort-select"
+        >
+          <option value="">Default</option>
+          <option value="reviews">Number of Reviews</option>
+          <option value="rating">Average Rating</option>
+        </select>
+      </div>
+      <div className="game-grid">
+        {sortedGames.map((game) => (
           <GameCard key={game.gameid} game={game} />
         ))}
       </div>
     </div>
   );
-};
-
-const styles = { grid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }, 
-title: { display: 'flex', justifyContent : 'center', }
 };
 
 export default HomePage;

@@ -14,7 +14,6 @@ CREATE TABLE Users (
 CREATE TABLE Games (
     GameID SERIAL PRIMARY KEY,
     Title VARCHAR(100) NOT NULL,
-    Genre VARCHAR(50),
     ReleaseDate DATE,
     Developer VARCHAR(100),
     Publisher VARCHAR(100),
@@ -45,14 +44,6 @@ CREATE TABLE Favorites (
     FavoriteID SERIAL PRIMARY KEY,
     UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
     GameID INT REFERENCES Games(GameID) ON DELETE CASCADE
-);
-
-CREATE TABLE Companies (
-    CompanyID SERIAL PRIMARY KEY,
-    Name VARCHAR(100) NOT NULL,
-    FoundedYear INT CHECK (FoundedYear > 1800),
-    Country VARCHAR(50),
-    Website TEXT
 );
 
 CREATE TABLE GameStatistics (
@@ -107,20 +98,6 @@ INSERT INTO Favorites (UserID, GameID) VALUES
 (3, 3),
 (4, 4),
 (5, 5);
-
-INSERT INTO Companies (Name, FoundedYear, Country, Website) VALUES
-('Adventure Inc', 2005, 'USA', 'https://adventureinc.com'),
-('PuzzlePro', 2010, 'UK', 'https://puzzlepro.com'),
-('Galactic Games', 2012, 'Germany', 'https://galacticgames.de'),
-('Zombie Labs', 2015, 'Canada', 'https://zombielabs.ca'),
-('QuestMakers', 2008, 'Japan', 'https://questmakers.jp');
-
-INSERT INTO Messages (SenderID, ReceiverID, MessageText) VALUES
-(1, 2, 'Hey, have you played the new game?'),
-(2, 3, 'Check out Mystery Island!'),
-(3, 4, 'I love the strategy elements in Space Conqueror.'),
-(4, 5, 'What do you think about Zombie Hunt?'),
-(5, 1, 'Fantasy Quest is a masterpiece!');
 
 INSERT INTO GameStatistics (GameID, AverageRating, ReviewCount) VALUES
 (1, 8.5, 2),

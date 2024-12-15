@@ -5,7 +5,8 @@ const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const userRoutes = require('./routes/userRoutes');
-const commentRoutes = require('./routes/commentRoutes')
+const commentRoutes = require('./routes/commentRoutes');
+const favoriteRoutes = require('./routes/favoriteRoutes');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/api/games', gameRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

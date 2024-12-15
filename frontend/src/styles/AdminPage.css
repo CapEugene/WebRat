@@ -1,0 +1,159 @@
+.admin-page {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.admin-title {
+  color: #4CAF50;
+  text-align: center;
+}
+
+.section-title {
+  color: #333;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.form-container {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.input-field {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.add-button, .update-button, .delete-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 16px;
+  text-align: center;
+  display: inline-block;
+  min-width: 100px; /* Устанавливаем минимальную ширину для одинакового размера */
+}
+
+.add-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.add-button:hover {
+  background-color: #45a049;
+}
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #d32f2f;
+}
+
+.update-button {
+  background-color: #ffc107;
+  color: black;
+  margin-right: 10px;
+}
+
+.update-button:hover {
+  background-color: #e0a800;
+}
+
+textarea.input-field {
+  resize: vertical; /* Разрешает изменение размера только по вертикали */
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.game-list {
+  list-style: none;
+  padding: 0;
+}
+
+.game-item {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.game-item button {
+  margin-right: 10px;
+}
+
+.game-item button:last-child {
+  margin-right: 0;
+}
+
+.edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 600px; /* Ограничиваем максимальную ширину */
+  box-sizing: border-box; /* Учитываем отступы внутри блока */
+  overflow-y: auto; /* Добавляем прокрутку, если содержимое слишком большое */
+}
+
+.modal-content .input-field {
+  width: 100%; /* Поля занимают всю ширину контейнера */
+  margin-bottom: 15px; /* Добавляем отступы между полями */
+  box-sizing: border-box; /* Корректно обрабатываем внутренние отступы */
+}
+
+textarea.input-field {
+  resize: vertical;
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.save-button,
+.cancel-button {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.save-button {
+  background: #007bff;
+  color: #fff;
+}
+
+.cancel-button {
+  background: #dc3545;
+  color: #fff;
+  margin-left: 10px;
+}

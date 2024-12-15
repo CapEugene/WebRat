@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { registerUser } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import '../styles/RegisterPage.css';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
@@ -22,12 +23,35 @@ const RegisterPage = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="username" placeholder="Username" onChange={handleChange} />
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} />
-      <button type="submit">Register</button>
-    </form>
+    <div className="register-page">
+      <h1 className="register-title">Register</h1>
+      <form onSubmit={handleSubmit} className="register-form">
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          onChange={handleChange}
+          className="input-field"
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          className="input-field"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          className="input-field"
+        />
+        <button type="submit" className="submit-button">
+          Register
+        </button>
+      </form>
+    </div>
   );
 };
 

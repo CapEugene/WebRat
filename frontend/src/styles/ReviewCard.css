@@ -1,0 +1,89 @@
+/* Контейнер карточки отзыва */
+.review-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Заголовок отзыва */
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .review-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .review-date {
+    font-size: 12px;
+    color: #888;
+  }
+  
+  /* Тело отзыва */
+  .review-body {
+    margin-bottom: 15px;
+  }
+  
+  .review-rating {
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  .review-text {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+    margin-top: 5px;
+    word-wrap: break-word; /* Позволяет длинным словам переноситься на следующую строку */
+    overflow-wrap: break-word; /* Современный стандарт для переносов */
+    word-break: break-word; /* Гарантирует перенос слов, если они не помещаются */
+    white-space: pre-wrap; /* Учитывает переносы строк и пробелы в тексте */
+    max-width: 100%; /* Гарантирует, что текст не выйдет за рамки карточки */
+  }
+  
+  /* Футер отзыва */
+  .review-footer {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .like-button,
+  .toggle-comments-button {
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Кнопка лайка */
+  .like-button {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .like-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Кнопка управления комментариями */
+  .toggle-comments-button {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  
+  .toggle-comments-button:hover {
+    background-color: #495057;
+  }
+  

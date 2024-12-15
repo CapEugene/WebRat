@@ -9,6 +9,17 @@ const getAllGames = async (req, res) => {
   }
 };
 
+const getGenres = async (req, res) => {
+  try {
+    //console.log("OK");
+    const genres = await GameModel.getGenres();
+    // console.log(genres);
+    res.json(genres);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getGameById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -20,4 +31,86 @@ const getGameById = async (req, res) => {
   }
 };
 
-module.exports = { getAllGames, getGameById };
+const addGame = async (req, res) => {
+  const { title, genre, releaseDate, developer, publisher, platform, description, coverImage } = req.body;
+  console.log(req);
+  
+  //console.log(req.user.userrole);
+  if (req.user.userrole !== 'admin') {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  try {
+    const newGame = await GameModel.addGame(title, releaseDate, developer, publisher, platform, description, coverImage);
+    if (genre && genre.length > 0) {
+      await GameModel.addGameGenres(newGame.gameid, genre);
+    }
+    
+    res.status(201).json(newGame);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const removeGame = async (req, res) => {
+  const { id } = req.params;
+
+  if (req.user.userrole !== 'admin') {
+    return res.status(403).json({ message: 'Access denied' });
+  }
+
+  try {
+    await GameModel.removeGame(id);
+    res.status(204).json({ message: 'Game deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// averagerating
+// : 
+// "2.75"
+// coverimage
+// : 
+// "cover1.jpg"
+// description
+// : 
+// "An epic adventure game."
+// developer
+// : 
+// "Adventure Inc"
+// gameid
+// : 
+// 1
+// genres
+// : 
+// (2) ['Action', 'Puzzle']
+// platform
+// : 
+// "PC"
+// publisher
+// : 
+// "GameWorld"
+// releasedate
+// : 
+// "2023-06-14T21:00:00.000Z"
+// reviewcount
+// : 
+// 8
+// title
+// : 
+// "The Great Adventure
+
+const updateGame = async (req, res) => {
+  const updateGame = req.body;
+  try {
+    await GameModel.updateGame(updateGame);
+    await GameModel.addGameGenres(updateGame.gameid, updateGame.genres);
+    res.status(204).json({ message: 'Game updated successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { getAllGames, getGameById, addGame, removeGame, getGenres, updateGame };
