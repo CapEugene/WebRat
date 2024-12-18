@@ -5,7 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const userRoutes = require('./routes/userRoutes');
-const commentRoutes = require('./routes/commentRoutes');
+const commentRoutes = require('../microbackend/comment-service/routes/commentRoutes');
 const favoriteRoutes = require('./routes/favoriteRoutes');
 
 const app = express();

@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: ./
+    ports:
+      - "5000:5000"
+    depends_on:
+      - auth-service
+      - comment-service
+      - favorites-service
+      - game-service
+      - review-service
+      - user-service
+
+  auth-service:
+    build:
+      context: ./auth-service
+    ports:
+      - "5001:5001"
+
+  comment-service:
+    build:
+      context: ./comment-service
+    ports:
+      - "5002:5002"
+
+  favorites-service:
+    build:
+      context: ./favorite-service
+    ports:
+      - "5003:5003"
+
+  game-service:
+    build:
+      context: ./game-service
+    ports:
+      - "5004:5004"
+
+  review-service:
+    build:
+      context: ./review-service
+    ports:
+      - "5005:5005"
+
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "5006:5006"
+
+  rabbitmq_manage:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672" # Порт для веб-интерфейса RabbitMQ
+    container_name: rabbitmq-container
+
+  rabbitmq_server:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"   # Основной порт RabbitMQ
+    container_name: rabbitmq-server

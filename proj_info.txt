@@ -4,11 +4,15 @@ GRANT ALL PRIVILEGES ON DATABASE appRating TO defuser;
 
 CREATE TABLE Users (
     UserID SERIAL PRIMARY KEY,
-    Username VARCHAR(50) NOT NULL,
     Email VARCHAR(100) UNIQUE NOT NULL,
-    PasswordHash VARCHAR(255) NOT NULL,
+    PasswordHash VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE UsersInfo (
+    UserID INT PRIMARY KEY, -- Внешний ключ к Users
+    Username VARCHAR(50) NOT NULL,
     JoinDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Avatar TEXT
+    Role VARCHAR(20) DEFAULT 'user'
 );
 
 CREATE TABLE Games (
@@ -24,8 +28,8 @@ CREATE TABLE Games (
 
 CREATE TABLE Reviews (
     ReviewID SERIAL PRIMARY KEY,
-    GameID INT REFERENCES Games(GameID) ON DELETE CASCADE,
-    UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
+    GameID INT,
+    UserID INT,
     Rating INT CHECK (Rating BETWEEN 1 AND 10),
     ReviewText TEXT,
     ReviewDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -34,16 +38,16 @@ CREATE TABLE Reviews (
 
 CREATE TABLE Comments (
     CommentID SERIAL PRIMARY KEY,
-    ReviewID INT REFERENCES Reviews(ReviewID) ON DELETE CASCADE,
-    UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
+    ReviewID INT,
+    UserID INT,
     CommentText TEXT NOT NULL,
     CommentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Favorites (
     FavoriteID SERIAL PRIMARY KEY,
-    UserID INT REFERENCES Users(UserID) ON DELETE CASCADE,
-    GameID INT REFERENCES Games(GameID) ON DELETE CASCADE
+    UserID INT,
+    GameID INT
 );
 
 CREATE TABLE GameStatistics (
