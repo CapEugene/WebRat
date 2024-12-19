@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const gameRoutes = require('./routes/gameRoutes');
 const amqp = require('amqplib');
 const { handleGameUpdateStatistics } = require('./gameQueueHandler')
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 
 // Подключение маршрутов

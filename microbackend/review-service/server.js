@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const reviewRoutes = require('./routes/reviewRoutes');
 const amqp = require('amqplib');
+const { handleReviewQueues } = require('./reviewQueueHandler');
 
 const app = express();
 app.use(bodyParser.json());
@@ -23,6 +24,7 @@ async function connectRabbitMQ() {
 connectRabbitMQ()
   .then(() => {
     app.locals.rabbitChannel = channel;
+    handleReviewQueues(channel);
   })
   .catch(console.error);
   

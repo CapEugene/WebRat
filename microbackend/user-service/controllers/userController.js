@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 
 const getUserProfile = async (req, res) => {
   const userId = req.user.userid;
+  //console.log(userId);
   try {
-    const user = await UserModel.getUserById(userId);
+    const user = await UserModel.getUserInfoById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {

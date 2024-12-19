@@ -8,6 +8,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+//console.log("OK");
 
 // RabbitMQ подключение
 let channel;

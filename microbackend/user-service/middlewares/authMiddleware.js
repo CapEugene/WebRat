@@ -1,7 +1,4 @@
-const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/config');
-
-const authenticate = (req, res, next) => {
+const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -9,19 +6,46 @@ const authenticate = (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1];
+  const channel = req.app.locals.rabbitChannel;
 
-  jwt.verify(token, jwtSecret, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid token' });
-    }
+  if (!channel) {
+    return res.status(500).json( {message: 'RabbitMQ channel not found'} );
+  }
 
-    if (!decoded.userid) {
-      return res.status(403).json({ message: 'Invalid token payload: userid missing' });
-    }
-    
-    req.user = decoded;
-    next();
+  try {
+    const correlationId = Math.random().toString(36).substring(7);
+
+    const responseQueue = await channel.assertQueue('', { exclusive: true });
+
+    channel.sendToQueue('auth.validate', Buffer.from(JSON.stringify({ token })), {
+      correlationId,
+      replyTo: responseQueue.queue,
   });
+
+  const result = await new Promise((resolve) => {
+    channel.consume(
+      responseQueue.queue,
+      (msg) => {
+        if (msg.properties.correlationId === correlationId) {
+          const data = JSON.parse(msg.content.toString());
+          resolve(data);
+      }
+      },
+      { noAck: true }
+    );
+  });
+
+  if (!result.valid) {
+    return res.status(403).json({ message: 'Invalid token '});
+  }
+
+  //console.log(result);
+  req.user = result.user;
+  next();
+  } catch (error) {
+    console.error('Authentication error:', error.message);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
 
 module.exports = { authenticate };

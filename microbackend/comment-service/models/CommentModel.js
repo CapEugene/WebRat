@@ -1,13 +1,16 @@
 const db = require('../config/db');
 
 const getCommentsByReviewId = async (reviewId) => {
-  const result = await db.query(`SELECT Comments.*, Users.Username
-    FROM Comments
-    JOIN Users ON Comments.UserID = Users.UserID
-    WHERE ReviewID = $1
-    ORDER BY CommentDate ASC`, [reviewId]);
+  const result = await db.query(
+    `SELECT CommentID, ReviewID, UserID, CommentText, CommentDate
+     FROM Comments
+     WHERE ReviewID = $1
+     ORDER BY CommentDate ASC`,
+    [reviewId]
+  );
   return result.rows;
 };
+
 
 const addComment = async (reviewId, userId, commentText) => {
   const result = await db.query(
@@ -17,4 +20,11 @@ const addComment = async (reviewId, userId, commentText) => {
   return result.rows[0];
 };
 
-module.exports = { getCommentsByReviewId, addComment};
+const deleteCommentsByReviewId = async (gameId) => {
+  const result = await db.query(
+    'DELETE FROM Comments WHERE ReviewID = $1',
+    [gameId]
+  );
+};
+
+module.exports = { getCommentsByReviewId, addComment, deleteCommentsByReviewId};

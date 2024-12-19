@@ -3,6 +3,7 @@ const { getAllGames, getGameById, addGame, removeGame, getGenres, updateGame } =
 const { authenticate } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
+//console.log("OK");
 router.get('/', getAllGames); // Получить все игры
 router.get('/:id', getGameById); // Получить игру по ID
 router.get('/genres/getgenres', getGenres);

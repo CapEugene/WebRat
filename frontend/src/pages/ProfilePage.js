@@ -5,27 +5,39 @@ import { format } from 'date-fns';
 import '../styles/ProfilePage.css';
 
 const ProfilePage = () => {
-  const [profile, setProfile] = useState();
+  const [profile, setProfile] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [error, setError] = useState(null); // Состояние для ошибки
+  const [loading, setLoading] = useState(true); // Состояние для загрузки
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
 
-    if(!token){
+    if (!token) {
       navigate('/');
+    } else {
+      setLoading(true); // Начинаем загрузку
+      getUserProfile()
+        .then((response) => setProfile(response.data))
+        .catch((err) => {
+          setError('Unable to load profile. Please try again later.');
+        })
+        .finally(() => {
+          setLoading(false); // Завершаем загрузку
+        });
     }
-    else{
-      getUserProfile().then((response) => setProfile(response.data));
-    }
-
   }, [navigate]);
 
   useEffect(() => {
     const loadFavorites = async () => {
-      const favorites = await fetchFavorites();
-      setFavorites(favorites);
-    }
+      try {
+        const favorites = await fetchFavorites();
+        setFavorites(favorites);
+      } catch (err) {
+        setError('Unable to load your favorite games. Please try again later.');
+      }
+    };
 
     loadFavorites();
   }, []);
@@ -36,6 +48,10 @@ const ProfilePage = () => {
       return 'Invalid Date';
     }
     return format(date, 'dd.MM.yyyy HH:mm:ss');
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; // Можете заменить на ваш индикатор загрузки
   }
 
   return (
@@ -45,6 +61,9 @@ const ProfilePage = () => {
         <h2>Welcome back, {profile ? profile.username : 'User'}!</h2>
         <p>Member since: {profile ? formatSafeDate(profile.joindate) : 'Loading...'}</p>
       </div>
+
+      {/* Показываем сообщение об ошибке */}
+      {error && <div className="error-message">{error}</div>}
 
       <div className="favorites-section">
         <h2>Your Favorite Games</h2>

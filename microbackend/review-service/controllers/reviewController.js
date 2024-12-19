@@ -2,16 +2,76 @@ const ReviewModel = require('../models/ReviewModel');
 
 const getReviewsByGameId = async (req, res) => {
   const { gameId } = req.params;
+  const channel = req.app.locals.rabbitChannel;
+
+  if (!channel) {
+    return res.status(500).json({ error: 'RabbitMQ channel not available' });
+  }
+
   try {
     const reviews = await ReviewModel.getReviewsByGameId(gameId);
-    res.json(reviews);
+
+    if (!reviews.length) {
+      return res.json([]);
+    }
+
+    const userIds = [...new Set(reviews.map((review) => parseInt(review.userid, 10)))];
+
+    //console.log('Fetching user data for IDs:', userIds); // Логирование
+    const userData = await requestUserData(channel, userIds);
+
+    const reviewsWithUsernames = reviews.map((review) => {
+      const user = userData.find((u) => u.userid === review.userid);
+      return {
+        ...review,
+        username: user ? user.username : 'Unknown User',
+      };
+    });
+    res.json(reviewsWithUsernames);
   } catch (error) {
+    console.error('Error in getReviewsByGameId:', error.message);
     res.status(500).json({ error: error.message });
   }
 };
 
+
+// Хелпер для запросов данных пользователей через RabbitMQ
+const requestUserData = (channel, userIds) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const correlationId = Math.random().toString(36).substring(7);
+      const responseQueue = await channel.assertQueue('', { exclusive: true });
+
+      channel.sendToQueue(
+        'user.getByIds',
+        Buffer.from(JSON.stringify({ userIds })),
+        { correlationId, replyTo: responseQueue.queue }
+      );
+
+      channel.consume(
+        responseQueue.queue,
+        (msg) => {
+          if (msg.properties.correlationId === correlationId) {
+            const data = JSON.parse(msg.content.toString());
+            if (data.error) {
+              reject(new Error(data.error));
+            } else {
+              resolve(data.users);
+            }
+          }
+        },
+        { noAck: true }
+      );
+    } catch (error) {
+      reject(new Error('Failed to request user data from user-service'));
+    }
+  });
+};
+
+
 const addReview = async (req, res) => {
   const { gameId, rating, reviewText } = req.body;
+  //console.log(req.body);
   const userId = req.user.userid; // ID пользователя из токена
 
   if (!userId) {
@@ -86,12 +146,14 @@ const addReview = async (req, res) => {
       );
     });
 
-    if (!userResult.user) {
+    //console.log(userResult);
+
+    if (!userResult) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     // 4. Формирование ответа
-    res.status(201).json({ ...review, username: userResult.user.username });
+    res.status(201).json({ ...review, username: userResult.username });
   } catch (error) {
     console.error('Error adding review:', error.message);
     res.status(500).json({ message: 'Internal Server Error' });
@@ -102,25 +164,31 @@ const addReview = async (req, res) => {
 const addLikeOnReview = async (req, res) => {
   const userId = req.user.userid;
 
-  if(!userId){
+  if (!userId) {
     return res.status(403).json({ message: 'Unauthorized' });
   }
-  
+
   const { reviewId } = req.params;
+
   try {
+    // Проверяем существование отзыва
     const review = await ReviewModel.getReviewById(reviewId);
-    if (!review){
+    //console.log(review);
+    if (!review) {
       return res.status(404).json({ message: 'Review not found' });
     }
 
+    // Обновляем количество лайков
     review.likes += 1;
     await ReviewModel.updateReviewStatistics(review);
 
     res.json({ likes: review.likes });
   } catch (error) {
+    console.error('Error liking review:', error.message);
     res.status(500).json({ message: 'Error liking review', error });
   }
 };
+
 
 
 module.exports = { getReviewsByGameId, addReview, addLikeOnReview };

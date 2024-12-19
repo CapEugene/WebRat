@@ -1,6 +1,7 @@
 const GameModel = require('../models/GameModel');
 
 const getAllGames = async (req, res) => {
+  //console.log("OK");
   try {
     const games = await GameModel.getAllGames();
     res.json(games);
@@ -33,7 +34,7 @@ const getGameById = async (req, res) => {
 
 const addGame = async (req, res) => {
   const { title, genre, releaseDate, developer, publisher, platform, description, coverImage } = req.body;
-  console.log(req);
+  //console.log(req);
   
   //console.log(req.user.userrole);
   if (req.user.userrole !== 'admin') {
@@ -61,6 +62,13 @@ const removeGame = async (req, res) => {
 
   try {
     await GameModel.removeGame(id);
+    await GameModel.removeGameStatistics(id);
+    await GameModel.removeGameGenres(id);
+
+    const channel = req.app.locals.rabbitChannel;
+
+    const message = JSON.stringify({ gameId: id });
+    channel.publish('events', 'game.deleted', Buffer.from(message));
     res.status(204).json({ message: 'Game deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });

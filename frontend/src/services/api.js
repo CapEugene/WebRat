@@ -37,7 +37,6 @@ export const addReview = async (gameId, rating, reviewText) => {
 export const registerUser = (data) => apiClient.post(`/auth/register/`, data);
 export const loginUser = (data) => apiClient.post(`/auth/login/`, data);
 export const getUserProfile = () => apiClient.get(`/users/profile/`);
-export const getTokenInfo = () => apiClient.get(`/users/tokeninfo/`);
 export const likeReview = async (reviewId) => {
   const response = await apiClient.post(`/reviews/${reviewId}/like/`);
   return response.data;

@@ -8,11 +8,12 @@ const ReviewCard = ({ review, onAddComment }) => {
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [likes, setLikes] = useState(review.likes);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [error, setError] = useState(null); // Состояние для ошибки
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
-  }, [isLoggedIn]);
+  }, []);
 
   const toggleComments = () => {
     setCommentsVisible(!commentsVisible);
@@ -20,12 +21,13 @@ const ReviewCard = ({ review, onAddComment }) => {
 
   const handleLike = async () => {
     try {
-      setLikes((prevlikes) => prevlikes + 1);
+      setLikes((prevLikes) => prevLikes + 1); // Временно увеличиваем лайк
       const response = await likeReview(review.reviewid);
       const updatedLikes = response.likes;
-      setLikes(updatedLikes);
+      setLikes(updatedLikes); // Обновляем количество лайков после успешной операции
     } catch (error) {
-      setLikes((prevlikes) => prevlikes - 1);
+      setLikes((prevLikes) => prevLikes - 1); // Возвращаем количество лайков, если ошибка
+      setError('Error liking the review. Please try again later.'); // Отображаем ошибку
       console.error('Error liking review:', error);
     }
   };
@@ -36,7 +38,7 @@ const ReviewCard = ({ review, onAddComment }) => {
       return 'Invalid Date';
     }
     return format(date, 'dd.MM.yyyy HH:mm:ss');
-  }
+  };
 
   return (
     <div className="review-card">
@@ -58,6 +60,8 @@ const ReviewCard = ({ review, onAddComment }) => {
           {commentsVisible ? 'Hide Comments' : 'Show Comments'}
         </button>
       </div>
+      {/* Отображение ошибки, если она есть */}
+      {error && <div className="error-message">{error}</div>}
       {commentsVisible && (
         <CommentSection
           comments={review.comments}

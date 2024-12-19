@@ -7,13 +7,26 @@ const HomePage = () => {
   const [games, setGames] = useState([]);
   const [sortedGames, setSortedGames] = useState([]);
   const [sortCriteria, setSortCriteria] = useState('');
+  const [error, setError] = useState(null); // Состояние для ошибки
+  const [loading, setLoading] = useState(true); // Состояние для загрузки
 
   useEffect(() => {
-    fetchGames().then((response) => {
-      setGames(response.data);
-      setSortedGames(response.data);
-      console.log(response.data);
-    });
+    fetchGames()
+      .then((response) => {
+        setGames(response.data);
+        setSortedGames(response.data);
+        setError(null); // Если запрос успешен, сбрасываем ошибку
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 504) {
+          setError('Game service is currently unavailable. Please try again later.'); // Устанавливаем сообщение об ошибке
+        } else {
+          setError('An unexpected error occurred.');
+        }
+      })
+      .finally(() => {
+        setLoading(false); // Завершаем загрузку
+      });
   }, []);
 
   const handleSortChange = (criteria) => {
@@ -29,6 +42,9 @@ const HomePage = () => {
     setSortedGames(sorted);
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Можете заменить на ваш индикатор загрузки
+  }
 
   return (
     <div className="home-page">
@@ -46,6 +62,10 @@ const HomePage = () => {
           <option value="rating">Average Rating</option>
         </select>
       </div>
+
+      {/* Показываем сообщение об ошибке, если оно есть */}
+      {error && <div className="error-message">{error}</div>}
+
       <div className="game-grid">
         {sortedGames.map((game) => (
           <GameCard key={game.gameid} game={game} />

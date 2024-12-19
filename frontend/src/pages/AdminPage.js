@@ -22,7 +22,7 @@ const AdminPage = () => {
     coverImage: '',
   });
 
-  const platforms = ['PC', 'PlayStation', 'XBox', 'Nintendo'];
+  const platforms = ['PC', 'PlayStation', 'XBox', 'Nintendo', 'Mobile', 'Other'];
 
   useEffect(() => {
     const token = localStorage.getItem('token');

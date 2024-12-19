@@ -3,10 +3,9 @@ const pool = require('../config/db');
 const ReviewModel = {
   async getReviewsByGameId(gameId) {
     const query = `
-      SELECT r.*, u.Username 
-      FROM Reviews r 
-      JOIN Users u ON r.UserID = u.UserID 
-      WHERE r.GameID = $1
+      SELECT * 
+      FROM Reviews 
+      WHERE GameID = $1
     `;
     const result = await pool.query(query, [gameId]);
     return result.rows;
@@ -14,9 +13,8 @@ const ReviewModel = {
 
   async getReviewById(reviewId) {
     const query = `
-      SELECT r.*, u.Username
+      SELECT r.*
       FROM Reviews r
-      JOIN Users u ON r.UserID = u.UserID
       WHERE r.ReviewID = $1
     `;
     const result = await pool.query(query, [reviewId]);
@@ -55,35 +53,17 @@ const ReviewModel = {
     }
   },
 
-  async updateGameStatistics(gameId, newRating) {
-    const checkQuery = `SELECT COUNT(*) FROM GameStatistics WHERE GameStatId = $1`;
-    const { rows } = await pool.query(checkQuery, [gameId]);
-  
-    if (rows[0].count === "0") {
-      // Если записи нет, создаем её
-      const insertQuery = `
-        INSERT INTO GameStatistics (GameId, AverageRating, ReviewCount)
-        VALUES ($1, $2, 1);
-      `;
-      await pool.query(insertQuery, [gameId, newRating]);
-    } else {
-      const updateQuery = `
-        UPDATE GameStatistics
-        SET 
-          AverageRating = ((GameStatistics.AverageRating * GameStatistics.ReviewCount) + $2) / (GameStatistics.ReviewCount + 1),
-          ReviewCount = GameStatistics.ReviewCount + 1
-        WHERE GameStatId = $1;
-      `;
-      await pool.query(updateQuery, [gameId, newRating]);
-    }
-  },
-
   async getUserById(userId) {
     const query = 'SELECT * FROM Users WHERE UserID = $1';
     const result = await pool.query(query, [userId]);
     // console.log(userId);
     return result.rows[0];
   },
+
+  async deleteReviewsByGameId(gameId) {
+    const query = 'DELETE FROM Reviews WHERE GameID = $1';
+    await pool.query(query, [gameId]);
+  }
   
 };
 

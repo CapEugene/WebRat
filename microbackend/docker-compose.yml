@@ -13,6 +13,7 @@ services:
       - game-service
       - review-service
       - user-service
+      - rabbitmq_server
 
   auth-service:
     build:

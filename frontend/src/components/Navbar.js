@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getTokenInfo } from '../services/api';
+import { getUserProfile } from '../services/api';
 import '../styles/Navbar.css';
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tokenInfo, setTokenInfo] = useState(null);
+  const [error, setError] = useState(null); // Добавляем состояние для ошибок
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,18 +17,18 @@ const Navbar = () => {
 
     const fetchTokenInfo = async () => {
       try {
-        const response = await getTokenInfo();
-        //console.log('Token Info Response:', response.data);
-        // console.log(response.data.username); // Логируем данные сразу после получения
-        setTokenInfo(response.data);
-        //console.log(tokenInfo.username);
+        const response = await getUserProfile();
+        setTokenInfo(response.data); // Устанавливаем данные профиля
       } catch (error) {
         console.error('Failed to fetch token info:', error);
+        setError('Failed to fetch user profile. Please try again later.'); // Устанавливаем ошибку
       }
     };
 
     checkLoginStatus();
-    isLoggedIn && fetchTokenInfo();
+    if (isLoggedIn) {
+      fetchTokenInfo();
+    }
 
     const handleStorageChange = async () => checkLoginStatus();
 
@@ -36,12 +37,11 @@ const Navbar = () => {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [tokenInfo?.username, isLoggedIn]);
+  }, [isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false); // Локально обновляем состояние
-    //alert('You have been logged out!');
     navigate('/');
   };
 
@@ -77,9 +77,14 @@ const Navbar = () => {
           </li>
         )}
       </ul>
-      {isLoggedIn && tokenInfo && (
+      {isLoggedIn && tokenInfo && !error && (
         <div className="navbar-user">
           <span>Welcome, <strong>{tokenInfo.username}</strong>!</span>
+        </div>
+      )}
+      {error && (
+        <div className="navbar-error">
+          <span>{error}</span> {/* Отображение ошибки, если она есть */}
         </div>
       )}
     </nav>

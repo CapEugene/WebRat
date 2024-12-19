@@ -20,44 +20,55 @@ const GameDetailsPage = () => {
   id = parseInt(id, 10);
   const [game, setGame] = useState({});
   const [reviews, setReviews] = useState([]);
+  const [sortedReviews, setSortedReviews] = useState([]);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [sortedReviews, setSortedReviews] = useState([]);
   const [sortCriteria, setSortCriteria] = useState('');
+  const [loading, setLoading] = useState(true); // Состояние загрузки
+  const [error, setError] = useState(null); // Состояние ошибки
 
   useEffect(() => {
-    fetchGameDetails(id).then((response) => setGame(response.data));
-    fetchGameReviews(id).then(async (response) => {
-      const reviewsWithComments = await Promise.all(
-        response.data.map(async (review) => {
-          const comments = await fetchReviewComments(review.reviewid);
-          return { ...review, comments: comments.data };
-        })
-      );
-      setReviews(reviewsWithComments);
-      setSortedReviews(reviewsWithComments);
-      //console.log(game);
-    });
+    const fetchGameData = async () => {
+      try {
+        const gameResponse = await fetchGameDetails(id);
+        setGame(gameResponse.data);
+        const reviewsResponse = await fetchGameReviews(id);
+        const reviewsWithComments = await Promise.all(
+          reviewsResponse.data.map(async (review) => {
+            const comments = await fetchReviewComments(review.reviewid);
+            return { ...review, comments: comments.data };
+          })
+        );
+        setReviews(reviewsWithComments);
+        setSortedReviews(reviewsWithComments);
+      } catch (error) {
+        setError('Error loading game details or reviews. Please try again later.');
+      } finally {
+        setLoading(false); // Завершаем загрузку
+      }
+    };
+
+    fetchGameData();
   }, [id]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
     const checkFavorites = async () => {
-      const favorites = await fetchFavorites();
-      // console.log("Fetched favorites:", favorites);
-      setIsFavorite(favorites.some((favorite) => favorite.gameid === id));
+      try {
+        const favorites = await fetchFavorites();
+        setIsFavorite(favorites.some((favorite) => favorite.gameid === id));
+      } catch (error) {
+        setError('Error loading favorite status. Please try again later.');
+      }
     };
 
-    isLoggedIn && checkFavorites();
-  }, [game.gameid, id, isLoggedIn])
+    if (isLoggedIn) checkFavorites();
+  }, [id, isLoggedIn]);
 
   const handleAddComment = async (reviewId, commentText) => {
     try {
       const newComment = await addComment(reviewId, commentText);
-  
-      // console.log('New comment:', newComment);
-  
       setReviews((prevReviews) =>
         prevReviews.map((review) =>
           review.reviewid === reviewId
@@ -65,8 +76,9 @@ const GameDetailsPage = () => {
             : review
         )
       );
+      return newComment;
     } catch (error) {
-      console.error('Error adding comment:', error);
+      setError('Error adding comment. Please try again later.');
     }
   };
 
@@ -80,26 +92,24 @@ const GameDetailsPage = () => {
         setIsFavorite(true);
       }
     } catch (error) {
-      console.error('Failed to toggle favorite:', error);
+      setError('Failed to toggle favorite. Please try again later.');
     }
   };
 
   const handleAddReview = async (rating, reviewText) => {
     try {
-      //console.log('Sending review:', { gameId: id, rating, reviewText });
       const review = await addReview(id, rating, reviewText);
       setReviews((prevReviews) => [...prevReviews, { ...review, comments: [], username: review.username || 'Current User' }]);
       setSortedReviews((prevReviews) => [...prevReviews, { ...review, comments: [], username: review.username || 'Current User' }]);
       const updatedGame = await fetchGameDetails(id);
       setGame(updatedGame.data);
     } catch (error) {
-      console.error('Error adding review:', error);
+      setError('Error adding review. Please try again later.');
     }
   };
 
   const handleSortChange = (criteria) => {
     setSortCriteria(criteria);
-  
     const sortedReviews = [...reviews];
     if (criteria === 'rating') {
       sortedReviews.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -115,8 +125,12 @@ const GameDetailsPage = () => {
       return 'Invalid Date';
     }
     return format(date, 'dd.MM.yyyy');
+  };
+
+  if (loading) {
+    return <div>Loading...</div>; // Показываем индикатор загрузки
   }
-  
+
   return (
     <div className="game-details-container">
       <div className="game-details-header">
@@ -139,6 +153,9 @@ const GameDetailsPage = () => {
           </button>
         )}
       </div>
+
+      {/* Сообщение об ошибке */}
+      {error && <div className="error-message">{error}</div>}
 
       <div className="review-section">
         <h2>Write a Review</h2>

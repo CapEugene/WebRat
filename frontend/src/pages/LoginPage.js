@@ -5,6 +5,8 @@ import '../styles/LoginPage.css';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState(null); // Состояние для ошибки
+  const [loading, setLoading] = useState(false); // Состояние для загрузки
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,20 +16,28 @@ const LoginPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     !!token && navigate('/profile');
-  }, [navigate]); 
+  }, [navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true); // Начинаем загрузку
     loginUser(formData)
       .then((response) => {
         const { token } = response.data;
         localStorage.setItem('token', token);
         window.dispatchEvent(new Event('storage'));
-        //alert('Login successful!');
         navigate('/profile');
-  })
-  .catch((err) => alert(`Error: ${err.response?.data?.message || 'Login failed'}`));
-
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 504) {
+          setError('Authorization service is currently unavailable. Please try again later.');
+        } else {
+          setError(`Error: ${err.response?.data?.message || 'Login failed'}`);
+        }
+      })
+      .finally(() => {
+        setLoading(false); // Завершаем загрузку
+      });
   };
 
   return (
@@ -52,10 +62,12 @@ const LoginPage = () => {
           required
           className="input-field"
         />
-        <button type="submit" className="submit-button">
-          Login
+        <button type="submit" className="submit-button" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
+      {/* Показываем сообщение об ошибке */}
+      {error && <div className="error-message">{error}</div>}
     </div>
   );
 };

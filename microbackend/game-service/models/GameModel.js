@@ -23,17 +23,27 @@ const GameModel = {
   },
 
   async getGameById(gameId) {
-    const query = `
-      SELECT g.*, gs.AverageRating, array_agg(gn.GenreName) AS genres
-      FROM Games g
-      LEFT JOIN GameStatistics gs ON g.GameID = gs.GameID
-      LEFT JOIN GameGenres gg ON g.GameID = gg.GameID
-      LEFT JOIN Genres gn ON gg.GenreID = gn.GenreID
-      WHERE g.GameID = $1
-      GROUP BY g.GameID, gs.AverageRating;
-    `;
-    const result = await pool.query(query, [gameId]);
-    return result.rows[0];
+      const query = `
+        SELECT g.*, gs.AverageRating, array_agg(gn.GenreName) AS genres
+        FROM Games g
+        LEFT JOIN GameStatistics gs ON g.GameID = gs.GameID
+        LEFT JOIN GameGenres gg ON g.GameID = gg.GameID
+        LEFT JOIN Genres gn ON gg.GenreID = gn.GenreID
+        WHERE g.GameID = $1
+        GROUP BY g.GameID, gs.AverageRating;
+      `;
+      const result = await pool.query(query, [gameId]);
+      return result.rows[0];
+    },
+
+    async getGamesByIds(gameIds) {
+      const query = `
+          SELECT GameID as gameid, Title as title, CoverImage as coverimage, ReleaseDate as releasedate 
+          FROM Games 
+          WHERE GameID = ANY($1::int[])
+      `;
+      const result = await pool.query(query, [gameIds]);
+      return result.rows;
   },
 
   async addGame(title, releaseDate, developer, publisher, platform, description, coverImage) {
@@ -74,6 +84,16 @@ const GameModel = {
     await pool.query(query, [gameId]);
   },
 
+  async removeGameStatistics (gameId) {
+      const query = `DELETE FROM GameStatistics WHERE GameID = $1`;
+      await pool.query(query, [gameId]);
+  },
+
+  async removeGameGenres(gameId) {
+    const query = `DELETE FROM GameGenres WHERE GameID = $1`;
+    await pool.query(query, [gameId]);
+  },
+
   async updateGame(game) {
     const query = `
     UPDATE Games
@@ -97,6 +117,29 @@ const GameModel = {
       game.description,
       game.coverimage
     ]);
+  },
+
+  async updateGameStatistics(gameId, newRating) {
+    const checkQuery = `SELECT COUNT(*) FROM GameStatistics WHERE GameStatId = $1`;
+    const { rows } = await pool.query(checkQuery, [gameId]);
+  
+    if (rows[0].count === "0") {
+      // Если записи нет, создаем её
+      const insertQuery = `
+        INSERT INTO GameStatistics (GameId, AverageRating, ReviewCount)
+        VALUES ($1, $2, 1);
+      `;
+      await pool.query(insertQuery, [gameId, newRating]);
+    } else {
+      const updateQuery = `
+        UPDATE GameStatistics
+        SET 
+          AverageRating = ((GameStatistics.AverageRating * GameStatistics.ReviewCount) + $2) / (GameStatistics.ReviewCount + 1),
+          ReviewCount = GameStatistics.ReviewCount + 1
+        WHERE GameStatId = $1;
+      `;
+      await pool.query(updateQuery, [gameId, newRating]);
+    }
   },
   
 };

@@ -3,14 +3,14 @@ const pool = require('../config/db');
 const FavoriteModel = {
   async getFavorites(userId) {
     const query = `
-       SELECT g.GameID, g.Title, g.CoverImage, g.ReleaseDate 
-       FROM Favorites f
-       JOIN Games g ON f.GameID = g.GameID
-       WHERE f.UserID = $1
+        SELECT GameID 
+        FROM Favorites 
+        WHERE UserID = $1
     `;
     const result = await pool.query(query, [userId]);
     return result.rows;
-  },
+},
+
 
   async addFavorite(userId, gameId) {
     const existQuery = `SELECT * FROM Favorites WHERE UserID = $1 AND GameID = $2`;
@@ -31,6 +31,11 @@ const FavoriteModel = {
       DELETE FROM Favorites WHERE UserID = $1 AND GameID = $2
       `;
       await pool.query(query, [userId, gameId]);
+  },
+
+  async deleteFavoritesByGameId(gameId) {
+    const query = 'DELETE FROM Favorites WHERE GameID = $1';
+    await pool.query(query, [gameId]);
   }
 };
 

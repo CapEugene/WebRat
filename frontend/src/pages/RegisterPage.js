@@ -5,6 +5,8 @@ import '../styles/RegisterPage.css';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [error, setError] = useState(null); // Состояние для ошибки
+  const [loading, setLoading] = useState(false); // Состояние для загрузки
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -14,12 +16,26 @@ const RegisterPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     !!token && navigate('/profile');
-  }, [navigate]); 
+  }, [navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    registerUser(formData).then(() => alert('User registered successfully!'));
-    navigate('/login');
+    setLoading(true); // Начинаем загрузку
+    registerUser(formData)
+      .then(() => {
+        alert('User registered successfully!');
+        navigate('/login');
+      })
+      .catch((err) => {
+        if (err.response && err.response.status === 504) {
+          setError('Registration service is currently unavailable. Please try again later.');
+        } else {
+          setError(`Error: ${err.response?.data?.message || 'Registration failed'}`);
+        }
+      })
+      .finally(() => {
+        setLoading(false); // Завершаем загрузку
+      });
   };
 
   return (
@@ -31,6 +47,8 @@ const RegisterPage = () => {
           name="username"
           placeholder="Username"
           onChange={handleChange}
+          value={formData.username}
+          required
           className="input-field"
         />
         <input
@@ -38,6 +56,8 @@ const RegisterPage = () => {
           name="email"
           placeholder="Email"
           onChange={handleChange}
+          value={formData.email}
+          required
           className="input-field"
         />
         <input
@@ -45,12 +65,16 @@ const RegisterPage = () => {
           name="password"
           placeholder="Password"
           onChange={handleChange}
+          value={formData.password}
+          required
           className="input-field"
         />
-        <button type="submit" className="submit-button">
-          Register
+        <button type="submit" className="submit-button" disabled={loading}>
+          {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
+      {/* Показываем сообщение об ошибке */}
+      {error && <div className="error-message">{error}</div>}
     </div>
   );
 };
