@@ -13,7 +13,6 @@ services:
       - game-service
       - review-service
       - user-service
-      - rabbitmq_server
 
   auth-service:
     build:
@@ -58,7 +57,7 @@ services:
     container_name: rabbitmq-container
 
   rabbitmq_server:
-    image: rabbitmq:management
+    image: rabbitmq:latest
     ports:
       - "5672:5672"   # Основной порт RabbitMQ
     container_name: rabbitmq-server

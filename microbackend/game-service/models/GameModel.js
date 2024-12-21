@@ -120,7 +120,7 @@ const GameModel = {
   },
 
   async updateGameStatistics(gameId, newRating) {
-    const checkQuery = `SELECT COUNT(*) FROM GameStatistics WHERE GameStatId = $1`;
+    const checkQuery = `SELECT COUNT(*) FROM GameStatistics WHERE GameId = $1`;
     const { rows } = await pool.query(checkQuery, [gameId]);
   
     if (rows[0].count === "0") {
@@ -136,7 +136,7 @@ const GameModel = {
         SET 
           AverageRating = ((GameStatistics.AverageRating * GameStatistics.ReviewCount) + $2) / (GameStatistics.ReviewCount + 1),
           ReviewCount = GameStatistics.ReviewCount + 1
-        WHERE GameStatId = $1;
+        WHERE GameId = $1;
       `;
       await pool.query(updateQuery, [gameId, newRating]);
     }

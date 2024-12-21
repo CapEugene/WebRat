@@ -49,7 +49,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-brand">
         <Link to="/" className="navbar-logo">
-          🎮 RatSite
+        🐀🎮 RatSite
         </Link>
       </div>
       <ul className="navbar-links">
